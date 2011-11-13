@@ -1,0 +1,45 @@
+{% load i18n %}
+{% load facebook %}
+{% load twitter %} 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+
+<link rel="stylesheet" href="{{ STATIC_URL }}/css/messaging.css" />
+
+<head>
+    <title>{% block title %}LOL2EZ{% endblock %}</title>
+</head>
+
+<body>
+    <div id="header">
+        {% block header %}
+        <a href="{% url index %}">{% trans "Home" %}</a> | 
+		<a href="{% url home %}">{% trans "Twilio Dashboard" %}</a> | 
+        {% if user.is_authenticated %}
+        {% trans "Logged in" %}: {{ user.username }} 
+        (<a href="{% url auth_logout %}">{% trans "Log out" %}</a> | 
+        <a href="{% url auth_password_change %}">{% trans "Change password" %}</a>)
+        {% else %}
+        <a href="{% url auth_login %}">{% trans "Log in" %}</a>
+        {% facebook_button 'https://encrypted-tbn2.google.com/images?q=tbn:ANd9GcTpfEEnut2_xHESJOQ6EPjHuNsxnwIs0ibahuX7pHunNsg-bW2c' %}
+		{% twitter_button 'data:image/jpg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBggSDgkUEwgKEhQWDRcVFxYTFxoYHxsYGRgeFiQcHh4hJzIqIyUkHhYiIS8iJDMqODg0ICo3PDUrNyYuLiwBCQoKDQsNGQ4OGS8iHyQ1NTA2NTQ1NTUsNSw1NTU1Lyw0LTU1NTU0NCw0NSwvLS8sLTY0NDUsNDQyLCw1LCw0LP/AABEIABgAlwMBIgACEQEDEQH/xAAaAAEAAgMBAAAAAAAAAAAAAAAABAUBAwYC/8QAORAAAQIEAwUECAQHAAAAAAAAAQIDAAQRIRIUMQUTIpGSI0FSVBUkMlFTYXGBBjNDsRZCYoKywdH/xAAaAQADAQEBAQAAAAAAAAAAAAAAAQIDBAYF/8QAIhEAAgIBBAIDAQAAAAAAAAAAAAECETEDBBITIUEUYdEi/9oADAMBAAIRAxEAPwCykZZt0S9WW1uOBNSoAlSlUuSdSSdTE2b2AygAhmUcGIpq2mtFDuNohfhx7ttl3/Va/cR0GzmlVfHpcy9HTVNSK/PUfSPtJXf0eQrCzd+/3wUGVlPKsdIjTKS0rumKy7JO7SSSke4RP/EL3rUxwkXTrS/COK1uL2vvFWy7RDN/0kf4iJTtWKUXFuJI3ez6kbmWr7sKe6PQlpPyzHSI6JpLrqZInOMBLzDZaViQhVThCmjYg95p9axpktjy7imyWHHcU6ptZ3ihu0gilaEXNTc15xl2r2jp+JJtKLKTKyflmOkRgy8nb1ZjpEXLGy5Eol6sOFS2H1Yt4uxbKgKCtP5RWsV+yaKTtDiWMMopXCojRSRemovobRfYnZm9vJNJvP5ZHysn5ZjpEMrJ+WY6RFs/s2RDThDLgWJFp7FjUeJWGow1pS5/1SIux5SVdRMFeKrZS4qiiKtCuIfXSh1vB2KrB7eXJRvJCMvJ29WY6RGcrKeUa+yB/wAi6e2bLtmdSlblRJrdBC1ewXEhAN78NzXWt9BTc2iWSHSJIJQrZAUcOIBZxIrf3g6kXvc6RPavSNFtXhs54y8kAayzA/tEa0+jSQA3KE/IJiZtZDbLyN3jQN224BiJwlSQqxN7H3xN2ptWZy2zMT7pC214xiPFRwi/2tFc8UsmXTXJSeCrysn5ZjpEYEvJ+WY6RF89sKQSHjiWcPbe2r8ghWFOutQBXW8eUSrBUoGWLx9FIcSFFajiok8F6jU0w6d1IntXpGnxJrw2UmVk/LMdIhlZPyzHSIvTsuTXuyJPD6ghxKUbztFWCvZIKim9Qk1vesQ5+UkW2XFiXmK5lTad4paSkYErFU95BUdfvWGtVN1QpbWUVdlNPKS02tbQDSxSi2+FQqQDQi4qCRGYibTdqy5f3fuIQ5JNi0nKKyR0vFFEqqlSbEGxBFqEdxBi3/jBRpjlZFxVLrUFVP1wqFT84QhJvJcopNxK+e2wXXFrUtuppZNgABQAfQCkaTNIo32ify0DX+kQhDJat2zBnRbtBziVJ7dW1dBl8VahRQgqSaUsoiohCE/I1/LtEUzifiDnDNo8aecIQ7J4oZtHjTzhm0eNPOEILDihm0eNPOGcT8Qc4QgsOKGbR4084ZtHjTzhCCw4oZtHjTzgJxPxBzhCCw4oZ1Nu0HOGbR4084QgDijCg47wNoW4s6JQMRNL2AvoKwhCOfV1XB0d+22sdWDk2f/Z'%}
+        {% endif %}
+        <hr />
+        {% endblock %}
+    </div>
+
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <div id="footer">
+        {% block footer %}
+        <hr />
+        {% endblock %}
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+This platform is in an alpha version.
+
+<p><strong>Instructions:</strong></p>
+
+<p>1) <a href="/accounts/register/">Register for an account</a></p>
+<p>2) Go to your email and click the activation link</p>
+<p>3) Enter in your twilio Account SID and Auth Token, then click update. Note this will change the sms url for all your twilio numbers.</p>
+<p>4) Create a new keyword, or just text into a number you own in that account and it will be created automatically.</p>
+<p>5) You can add phone numbers manually, or they will be automatically added when they text in the key word</p>
+<p>6) Select a group, enter a message, and click send. It will send that message to everyone in the group</p>
+
+
+<p>The only browser I support for now is Google Chrome. It will likely work in others, but upgrade to Chrome :-p
+<br />
+-deafeye
+</p>
+<br /><br /><br />
+
+
+
+{% endblock %}

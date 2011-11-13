@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+
+<style type="text/css">
+	.myButton {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) );
+	background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf');
+	background-color:#ededed;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	color:#777777;
+	font-family:arial;
+	font-size:15px;
+	font-weight:bold;
+	padding:6px 24px;
+	text-decoration:none;
+	text-shadow:1px 1px 0px #ffffff;
+}.myButton:hover {
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed) );
+	background:-moz-linear-gradient( center top, #dfdfdf 5%, #ededed 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed');
+	background-color:#dfdfdf;
+}.myButton:active {
+	position:relative;
+	top:1px;
+}
+	
+</style>
+
+
+<table>
+	<form id="twilio_info" method="post">
+		{% csrf_token %}
+		<tr>
+			<th align="left">ACCOUNT SID</th>
+			<td colspan="2">
+				<input id="account_sid" name="account_sid"  type="text" size="50"/>		
+			</td>
+		</tr>
+		<tr>
+			<th align="left">AUTH TOKEN</th>
+			<td colspan="2">
+				<input id="auth_token" name="auth_token"   type="text" size="50"/>		
+			</td>
+		</tr>
+		<tr>
+			<td><a class="myButton" onclick="document.getElementById('twilio_info').submit()">Update Twilio Info</a></td>
+		</tr>
+	</form>
+	
+</table>
+
+
+<table>
+	<tr>
+		<th align="left">Keyword</th>
+		<th align="left">Phone Numbers</th>		
+		<th align="left">Automated Response</th>
+	</tr>
+	<tr>
+		<td valign="top"><select id="groups" size="15" style="width: 20em;" onclick="updateNumbers()"></select></td>
+		<td valign="top"><select name="phone_numbers" id="phone_numbers" size="15" style="width: 20em;"></select></td>
+		<td valign="top"><textarea id="group_response" cols="40" rows="4"></textarea></td>
+	</tr>
+	<tr>
+		<td>
+			<a class="myButton"  id = "newgroup" onclick="newgroup()">New</a>
+			<a class="myButton" id = "editgroup" onclick="editgroup()">Edit</a>
+			<a class="myButton" id = "deletegroup" onclick="deletegroup()">Delete</a>
+		</td>
+		<td>
+			<a class="myButton" id = "newphone" onclick="newphone()">New</a>
+			<a class="myButton" id = "editphone" onclick="editphone()">Edit</a>
+			<a class="myButton" id = "deletephone" onclick="deletephone()">Delete</a>
+		</td>
+		<td>
+			<a class="myButton" id = "updateresponse" onclick="saveResponse()">Update Keyword Response</a>
+		</td>
+	</tr>
+	<tr>
+		<th align="left">Message</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<textarea id="message" cols="40" rows="4"></textarea>
+		</td>
+	<tr>
+	<tr>
+		<td><a class="myButton" onclick="sendMessage()">Send Text</a></td>
+	</tr>
+
+</table>
+
+<script type="text/javascript">
+
+
+	function updateGroups(){
+		var myselect = document.getElementById('groups');
+		while (myselect.options.length > 0) {
+			myselect.remove(0);
+		}	
+		
+		$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_get_groups_for_user %}',
+	  			success: function(data){
+	  				for(var key in data)
+	  				{
+	  					try{
+ 							myselect.add(new Option(data[key], key), null) //add new option to end
+						}
+						catch(e){ //in IE, try the below version instead of add()
+ 							myselect.add(new Option(data[key], key)) //add new option to end 
+						}	
+	  				}
+
+	  			},
+			});
+	}
+	
+	function updateNumbers(){
+		updateResponse();
+		var myselect = document.getElementById('phone_numbers');
+		while (myselect.options.length > 0) {
+			myselect.remove(0);
+		}
+		
+		var postdata = {
+			id : document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value
+		}	
+		
+		$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_get_phones_for_group %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				for(var key in data)
+	  				{
+	  					try{
+ 							myselect.add(new Option(data[key], key), null) //add new option to end
+						}
+						catch(e){ //in IE, try the below version instead of add()
+ 							myselect.add(new Option(data[key], key)) //add new option to end 
+						}	
+	  				}
+
+	  			},
+			});
+	}
+
+	function newgroup(){
+		var gname = '';
+		gname = prompt('Enter keyword', '');
+		var postdata = {
+			name: gname
+		}
+		
+		if(gname != null){
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_new_group %}',
+	  			data: postdata,
+	  			success: function(data){
+					updateGroups();
+	  			},
+			});
+		}
+		
+	}
+	
+	function editgroup(){
+		var key = document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value;
+		var gname = '';
+		gname = prompt('Enter keyword', '');
+		
+		var postdata = {
+			name: gname,
+			id : key
+		}
+		
+		if(gname != ''){
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_edit_group %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				updateGroups();
+
+	  			},
+			});
+		}
+		
+	}
+	
+	function deletegroup(){
+		var key = document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value;
+		if (confirm('Are you sure you want to delete this keyword?'))
+		{
+			var postdata = {
+			id : key
+		}
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_delete_group %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				updateGroups();
+
+	  			},
+			});
+		}
+		
+	}
+	
+	function newphone(){
+		var gname = '';
+		var key = document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value;
+		gname = prompt('Enter phone number', '1231231234');
+		
+		var postdata = {
+			name: gname,
+			id: key
+		}
+		
+		if(gname != ''){
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_new_phone %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				updateNumbers();
+	  			}
+			});
+
+		}
+	}
+	
+	function editphone(){
+		var key = document.getElementById("phone_numbers").options[document.getElementById("phone_numbers").selectedIndex].value;
+		var gname = '';
+		gname = prompt('Enter phone number', '1231231234');
+		
+		var postdata = {
+			name: gname,
+			id : key
+		}
+		
+		if(gname != ''){
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_edit_phone %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				updateNumbers();
+
+	  			},
+			});
+		}
+	}
+	
+	function deletephone(){
+		var key = document.getElementById("phone_numbers").options[document.getElementById("phone_numbers").selectedIndex].value;
+		if (confirm('Are you sure you want to delete this phone number?'))
+		{
+			var postdata = {
+			id : key
+		}
+			$.ajax({
+	  			type: 'POST',
+	  			url: '{% url ajax_delete_phone %}',
+	  			data: postdata,
+	  			success: function(data){
+	  				updateNumbers();
+
+	  			},
+			});
+		}
+	}
+
+	function sendMessage()
+	{
+		var myselect = document.getElementById('phone_numbers');
+		
+		for (var i=0; i<myselect.length; i++){
+			
+			var postdata = {
+				phone: myselect.options[i].text,
+				message: document.getElementById('message').value
+			}
+		
+			$.ajax({
+  				type: 'POST',
+  				url: '{% url ajax_send_text_message %}',
+  				data: postdata,
+  				success: function(data){
+  					
+  				},
+			});
+			
+		}
+		alert('message sent');
+	}
+	
+	function updateResponse()
+	{
+		var postdata = {
+				id: document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value
+		}
+		
+		$.ajax({
+  				type: 'POST',
+  				url: '{% url ajax_get_group_response %}',
+  				data: postdata,
+  				success: function(data){
+  					document.getElementById("group_response").value = data;
+  				},
+		});
+		
+	}
+	
+	function saveResponse()
+	{
+		var postdata = {
+				id: document.getElementById("groups").options[document.getElementById("groups").selectedIndex].value,
+				response: document.getElementById("group_response").value
+		}
+		
+		$.ajax({
+  				type: 'POST',
+  				url: '{% url ajax_update_group_response %}',
+  				data: postdata,
+  				success: function(data){
+  					alert('reponse updated!');
+  				},
+		});
+	}
+	
+	function getTwilioCreds()
+	{
+		$.ajax({
+			type: 'POST',
+			url: '{% url ajax_get_twilio_credentials %}',
+			success: function(data){
+				document.getElementById('account_sid').value = data['account_sid'];
+				document.getElementById('auth_token').value = data['auth_token'];
+				document.getElementById('send_phone').value = data['send_phone'];
+			}
+		})
+	}
+	
+	
+	//onload events
+
+
+
+
+	$(window).load(function() {
+		getTwilioCreds();
+		
+//		$("#divId").dialog({ 
+//			autoOpen: false,
+//			buttons: { "Ok": function() { $(this).dialog("close"); }},
+//			modal: true, 
+				
+//		});
+		
+		updateGroups();
+		//alert('loaded');
+	});
+	
+	
+</script>
+{% endblock %}

@@ -1,0 +1,5 @@
+Hello {{ email }},
+
+Thank you for purchasing {{ product.product_name}}. Your card has been charged ${{ total|floatformat:2 }}. 
+To download your product, please visit {{ link }} using the password {{ password }}. This password will be good for a total of
+{{ download_limit }} downloads.  
