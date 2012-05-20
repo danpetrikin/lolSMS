@@ -22,7 +22,6 @@ from apps.lolSMS.models import *
 from django.core.servers.basehttp import FileWrapper
 from django.core.mail import EmailMultiAlternatives
 import os
-import stripe
 from django.http import Http404
 from settings import BASE_SMS_URL
 from django.contrib.auth.models import User

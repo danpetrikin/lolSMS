@@ -9,7 +9,6 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    url(r'^social/', include('socialregistration.urls',namespace = 'socialregistration')),                       
     (r'^accounts/', include('registration.urls')),
     url(r"^index/$", views.index, name="index"),
     url(r"^$", views.index, name="indexpage"),

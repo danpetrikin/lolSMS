@@ -95,13 +95,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'socialregistration.contrib.facebook.middleware.FacebookMiddleware',
 )
 
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
-        'socialregistration.auth.FacebookAuth',
-        'socialregistration.contrib.twitter.auth.TwitterAuth',
 )
 
 
@@ -131,16 +128,11 @@ INSTALLED_APPS = (
     "apps.lolSMS",
     "gunicorn",
     "registration",
-    "notification",
-    "mailer",
     "south",
-    'socialregistration',
-    'socialregistration.contrib.facebook',
-    'socialregistration.contrib.twitter',
 )
 
 #Override these in local_settings
-BASE_SMS_URL = 'http://www.example.com/sms/'
+BASE_SMS_URL = 'http://lol2ez.com/sms/'
 TWITTER_CONSUMER_KEY = ''
 TWITTER_CONSUMER_SECRET_KEY = ''
 FACEBOOK_APP_ID = ''
